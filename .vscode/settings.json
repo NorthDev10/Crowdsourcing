@@ -1,0 +1,16 @@
+// Поместите параметры в этот файл, чтобы перезаписать параметры по умолчанию.
+{
+    "[html]": {
+        // Число пробелов в табуляции. Эта настройка переопределяется на основании содержимого файла, когда включен параметр "editor.detectIndentation".
+        "editor.tabSize": 2
+    },
+    "workbench.colorTheme": "Default Light+",
+    "extensions.ignoreRecommendations": false,
+   /* "terminal.integrated.shellArgs.windows": [
+        "/k",
+        "H:\\Program Files\\Git\\bin\\bash.exe"
+    ],*/
+    "workbench.iconTheme": "vs-seti",
+    "files.autoSave": "afterDelay",
+    "git.ignoreLimitWarning": true,
+}

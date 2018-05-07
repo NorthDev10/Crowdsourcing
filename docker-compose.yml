@@ -1,0 +1,58 @@
+version: "3.1"
+services:
+
+  # The Application
+  app:
+    build:
+      context: ./docker/php-fpm/
+      dockerfile: app.dockerfile
+    container_name: crowdsourcing-app
+    working_dir: /var/www
+    volumes:
+      - ./site/:/var/www
+      - ./docker/php-fpm/php-ini-overrides.ini:/usr/local/etc/php/conf.d/php.ini
+    environment:
+      - "DB_PORT=3306"
+      - "DB_HOST=database"
+
+  # The Web Server
+  web:
+    build:
+      context: ./docker/nginx/
+      dockerfile: web.dockerfile
+    container_name: crowdsourcing-web
+    working_dir: /var/www
+    volumes:
+      - ./site/:/var/www
+    ports:
+      - 80:80
+      
+  # The Database
+  database:
+    image: mysql:5.7
+    container_name: crowdsourcing-db
+    volumes:
+      - dbdata:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=crowdsourcing
+      - MYSQL_USER=Stas
+      - MYSQL_PASSWORD=secret
+    ports:
+        - "33062:3306"
+        
+  # The phpmyadmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin-crowdsourcing
+    ports:
+      - 8182:80
+    environment:
+      - MYSQL_USERNAME=root
+      - MYSQL_ROOT_PASSWORD=secret
+      - PMA_HOST=database
+    links:
+      - database:mysql
+      
+volumes:
+  dbdata:
