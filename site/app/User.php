@@ -15,7 +15,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'phone', 'password',
     ];
 
     /**
@@ -47,18 +47,13 @@ class User extends Authenticatable
         return $this->hasMany('App\Review');
     }
 
-    // пользователь выполняет следующие проекты
-    public function projectsInExecution() {
-        return $this->hasMany('App\ProjectExecutor');
+    // комментарии к задачам
+    public function commentsOnTasks() {
+        return $this->hasMany('App\TaskExecutor');
     }
 
-    // Пользователь оставил следующие комментарии
-    public function comments() {
-        return $this->hasMany('App\Comment');
-    }
-
-    // пользователь оставил следующие сообщения в чате
-    public function groupChats() {
-        return $this->hasMany('App\GroupChat');
+    // пользователь выполняет следующие задачи
+    public function subtasks() {
+        return $this->belongsToMany('App\Subtask', 'task_executors');
     }
 }

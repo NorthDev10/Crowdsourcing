@@ -12,5 +12,9 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('welcome', [
+        'category'   => [],
+        'categories' => App\Category::with('children')->where('parent_id', '0')->get(),
+        'delimiter'  => ''
+     ]);
 });

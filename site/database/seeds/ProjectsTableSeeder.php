@@ -13,9 +13,10 @@ class ProjectsTableSeeder extends Seeder
     {
         $allSkils = App\Skill::count();
         $allUsers = App\User::count();
+        $allCategories = App\Category::count();
         
         factory(App\Project::class, 5)->create()->each(function($p) 
-                use ($allSkils, $allUsers) {
+                use ($allSkils, $allUsers, $allCategories) {
             $faker = Faker\Factory::create();
             $numSkills = $faker->unique()->numberBetween(1, 5);
             // генерируем id скилов
@@ -23,53 +24,39 @@ class ProjectsTableSeeder extends Seeder
             for($i = 0; $i < $numSkills; ++$i) {
                 $skillIDList[] = $faker->unique()->numberBetween(1, $allSkils);
             }
-            // генерируем необходимые навыки
+            // записываем необходимые навыки
             $p->necessarySkills()->attach($skillIDList);
-            
-            // пользователи комментируют
-            $comments = [];
-            for($i = 0; $faker->numberBetween(0, 10); ++$i) {
-                $comment = new App\Comment();
-                $comment->project_id = $p->id;
-                $comment->user_id = $faker->numberBetween(1, $allUsers);
-                $comment->description = $faker->realText(50);
-                $comments[] = $comment;
-            }
-
-            $p->comments()->saveMany($comments);
             
             $faker = Faker\Factory::create();
 
+            // генерируем таски
+            $subtaskList = [];
+            for($i = 0; $i < $faker->numberBetween(1, 5); ++$i) {
+                $subtask = new App\Subtask();
+                $subtask->project_id = $p->id;
+                $subtask->category_id = $faker->unique()->numberBetween(1, $allCategories);
+                $subtask->number_executors = $faker->numberBetween(1, 4);
+                $subtask->description = $faker->realText(50);
+                $subtask->status = $faker->boolean;
+                $subtaskList[] = $subtask;
+            }
+
+            $p->subtasks()->saveMany($subtaskList);
+
+            
             // желающие поучаствовать в проекте
             $users = [];
-            for($i = 0; $faker->numberBetween(0, 10); ++$i) {
-                $pe = new App\ProjectExecutor();
-                $pe->project_id = $p->id;
-                $pe->user_id = $faker->unique()->numberBetween(1, $allUsers);
-                $pe->user_selected = $faker->boolean;
-                $users[] = $pe;
-            }
-            $p->projectExecutors()->saveMany($users);
-
-            // исполнители проекта общаются в чате
-            $messageList = [];
-            for($i = 0; $i < count($users); ++$i) {
-                if($users[$i]->user_selected) {
-                    $numMessage = $faker->numberBetween(0, 5);
-                    for($j = 0; $j < $numMessage; ++$j) {
-                        $message = new App\GroupChat();
-                        $message->project_id = $p->id;
-                        $message->user_id = $users[$i]->user_id;
-                        $message->message = $faker->realText(25);
-                        $messageList[] = $message;
-                    }
+            foreach($subtaskList as $subtask) {
+                for($i = 0; $i < $subtask->number_executors; $i++) { 
+                    $user = new App\TaskExecutor();
+                    $user->subtask_id = $subtask->id;
+                    $user->user_id = $faker->numberBetween(1, $allUsers);
+                    $user->comment = $faker->realText(50);
+                    $user->user_selected = $faker->boolean;
+                    $user->save();
+                    $users[] = $user;
                 }
             }
-
-            $p->projectExecutors()
-                ->first()
-                ->groupChats()
-                ->saveMany($messageList);
 
             // если проект завершен, то генерируем отзывы
             if($p->status == false) {

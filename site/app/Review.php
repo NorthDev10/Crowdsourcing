@@ -6,12 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Review extends Model
 {
+    protected $fillable = [
+        'user_id', 'description'
+    ];
+
     // отзыв принадлежит проекту
     public function project() {
         return $this->belongsTo('App\Project');
     }
 
-    // отзыв принадлежит пользователю
+    // отзыв написан для исполнителя
     public function user() {
         return $this->belongsTo('App\User');
     }

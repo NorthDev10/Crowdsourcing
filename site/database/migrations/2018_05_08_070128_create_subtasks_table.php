@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateGroupChatsTable extends Migration
+class CreateSubtasksTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,13 @@ class CreateGroupChatsTable extends Migration
      */
     public function up()
     {
-        Schema::create('group_chats', function (Blueprint $table) {
+        Schema::create('subtasks', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('project_id')->unsigned();
-            $table->integer('user_id')->unsigned();
-            $table->text('message');
+            $table->integer('category_id')->unsigned();
+            $table->tinyInteger('number_executors')->unsigned()->default(1);
+            $table->text('description');
+            $table->boolean('status');
             $table->timestamps();
         });
     }
@@ -29,6 +31,6 @@ class CreateGroupChatsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('group_chats');
+        Schema::dropIfExists('subtasks');
     }
 }
