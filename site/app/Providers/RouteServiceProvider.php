@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Project;
+use App\Subtask;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
@@ -26,6 +28,16 @@ class RouteServiceProvider extends ServiceProvider
         //
 
         parent::boot();
+
+        Route::bind('my_project', function($value) {
+            return Project::where('slug', $value)->first();
+        });
+
+        Route::bind('project', function($value) {
+            return Project::with('customer', 'typeProject', 
+                'executors.user', 'executors.subtask')
+                ->where('slug', $value)->first();
+        });
     }
 
     /**

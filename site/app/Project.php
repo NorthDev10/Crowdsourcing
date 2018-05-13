@@ -2,14 +2,19 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Project extends Model
 {
+    use SoftDeletes;
+
+    protected $dates = ['deleted_at'];
 
     protected $fillable = [
         'category_id', 'project_name', 'project_description',
-        'deadline', 'tender_closing'
+        'deadline', 'tender_closing', 'status'
     ];
 
     // проектом управляет следующий заказчик
@@ -17,14 +22,9 @@ class Project extends Model
         return $this->belongsTo('App\User', 'user_id');
     }
 
-    // Перечень необходимых навыков от исполнителя
-    public function necessarySkills() {
-        return $this->belongsToMany('App\Skill', 'necessary_skills');
-    }
-
-    // Проект относится к категории
-    public function category() {
-        return $this->belongsTo('App\Category');
+    // Проект относится к типу
+    public function typeProject() {
+        return $this->belongsTo('App\Category', 'type_project_id');
     }
 
     // проект разделён на подзадачи
@@ -40,5 +40,27 @@ class Project extends Model
     // пользователи, желающие поучаствовать в данном проекте
     public function executors() {
         return $this->hasManyThrough('App\TaskExecutor', 'App\Subtask');
+    }
+
+    // до истечения срока проекта
+    public function beforeDeadlineLeft() {
+        $deadline = Carbon::parse($this->deadline);
+        return $deadline->diffInDays($this->created_at);
+    }
+    
+    // название категории, которой принадлежит проект
+    public function typeProjectName() {
+        if(is_null($this->typeProject)) {
+            return $this->slug;
+        } else {
+            return $this->typeProject->slug;
+        }
+    }
+
+    public function status() {
+        if($this->status == 'opened' && ($this->beforeDeadlineLeft() > 0)) {
+            return true; // в проект ищут исполнителей
+        }
+        return false;
     }
 }

@@ -8,8 +8,8 @@ class Skill extends Model
 {
     public $timestamps = false;
 
-    //Проекты соответствуют данному навыку
-    public function projects() {
-        return $this->belongsToMany('App\Project', 'necessary_skills');
+    //Задачи соответствуют данному навыку
+    public function tasks() {
+        return $this->belongsToMany('App\Subtask', 'necessary_skills');
     }
 }

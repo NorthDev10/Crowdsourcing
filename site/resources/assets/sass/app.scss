@@ -7,8 +7,58 @@
 
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
+@import "~fontawesome-scss/fontAwesome.scss";
+
+html, body {
+  height: 100%;
+}
+
+h1 {
+  font-size: 14pt;
+}
 
 .navbar-laravel {
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.project-paginate, .margin-h-20 {
+  margin: 20px 0;
+}
+
+aside {
+  margin-bottom: 10px;
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 17px;
+  }
+}
+
+.project-list {
+  .fa-check {
+    @include fa($fa-check, 'green', 15pt);
+  }
+
+  .action {
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  .fa-pencil {
+    @include fa($fa-pencil, 'black', 30pt);
+  }
+
+  .fa-trash {
+    @include fa($fa-trash, 'red', 30pt);
+  }
+
+  .calendar-check {
+    @include fa($fa-calendar, 'green', 15pt);
+  }
 }

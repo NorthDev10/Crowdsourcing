@@ -16,7 +16,13 @@ window.Vue = require('vue');
  */
 
 Vue.component('example-component', require('./components/ExampleComponent.vue'));
+Vue.component('search-input', require('./components/search-input/SearchInput.vue'));
+
+import project from './components/Project/Project.vue';
 
 const app = new Vue({
-    el: '#app'
+    el: '#app',
+    components: {
+        project
+    },
 });

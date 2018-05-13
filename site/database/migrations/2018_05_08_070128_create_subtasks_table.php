@@ -17,7 +17,11 @@ class CreateSubtasksTable extends Migration
             $table->increments('id');
             $table->integer('project_id')->unsigned();
             $table->integer('category_id')->unsigned();
+            $table->string('task_name');
+            //необходимо участников
             $table->tinyInteger('number_executors')->unsigned()->default(1);
+            //участвуют
+            $table->tinyInteger('involved_executors')->unsigned()->default(0);
             $table->text('description');
             $table->boolean('status');
             $table->timestamps();

@@ -1,19 +1,25 @@
 <?php
 
 use Faker\Generator as Faker;
+use \Carbon\Carbon;
 
 $factory->define(App\Project::class, function (Faker $faker) {
     $allUsers = App\User::count();
     $allCategories = App\Category::count();
 
+    $project_name = $faker->realText(50);
     $tenderClosing = $faker->dateTimeBetween('now', '+4 days');
-
+    $date = Carbon::now()->format('d-m-Y-');
+    $status = ['opened', 'performed', 'closed'];
+    $categoryList = App\Category::where('parent_id', 0)->get();
+    
     return [
         'user_id' => $faker->numberBetween(1, $allUsers),
-        'category_id' => $faker->numberBetween(1, $allCategories),
-        'project_name' =>  $faker->realText(50),
+        'type_project_id' => $categoryList[$faker->numberBetween(0, count($categoryList)-1)]->id,
+        'project_name' =>  $project_name,
         'project_description' => $faker->realText(1000),
-        'status' => $faker->boolean,
+        'slug' => $date.str_slug($project_name, '-'),
+        'status' => $status[$faker->numberBetween(0, count($status)-1)],
         'deadline' => $faker->dateTimeBetween($tenderClosing, '+4 weeks'),
         'tender_closing' => $tenderClosing,
     ];
