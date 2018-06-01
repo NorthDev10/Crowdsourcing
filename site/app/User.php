@@ -2,6 +2,10 @@
 
 namespace App;
 
+use Auth;
+use App\Skill;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -46,7 +50,7 @@ class User extends Authenticatable
     public function reviewsFromUsers() {
         return $this->hasMany('App\Review');
     }
-
+    
     // комментарии к задачам
     public function commentsOnTasks() {
         return $this->hasMany('App\TaskExecutor');
@@ -54,6 +58,33 @@ class User extends Authenticatable
 
     // пользователь выполняет следующие задачи
     public function subtasks() {
-        return $this->belongsToMany('App\Subtask', 'task_executors');
+        return $this->belongsToMany('App\Subtask', 'task_executors')
+            ->where('user_selected', true);
+    }
+
+    public static function updateProfile(Request $request, User $user):array {
+        if(Auth::user()->id == $user->id) {
+            $userData = $request->except('password');
+
+            if($request->has('password')) {
+                $userData['password'] = Hash::make($request->input('password'));
+                $userData['remember_token'] = str_random(10);
+            }
+            
+            $user->fill($userData);
+            // все скилы, которые не были в списке - открепляются
+            $user->skills()->sync(
+                Skill::getSkillIdList(
+                    $userData['skills']
+                )
+            );
+            if($user->update()) {
+                return ['status' => true];
+            } else {
+                return ['status' => false];
+            }
+        } else {
+            return ['status' => false, 'message' => 'Вы можете редактировать только свой профиль!'];
+        }
     }
 }

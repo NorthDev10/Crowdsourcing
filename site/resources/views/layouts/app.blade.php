@@ -24,15 +24,20 @@
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light navbar-laravel">
             <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
-                </a>
-                <a class="navbar-brand" href="{{ route('subtasks') }}">
+                <a class="navbar-brand" href="{{ route('home') }}">
                     Каталог задач
                 </a>
+                @auth
                 <a class="navbar-brand" href="{{ route('my-projects.index') }}">
                     Мои проекты
                 </a>
+                <a class="navbar-brand" href="{{ route('my-tasks.index') }}">
+                    Мои задачи
+                </a>
+                <a class="navbar-brand" href="{{ route('my-profile.index') }}">
+                    Мой профиль
+                </a>
+                @endauth
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -47,8 +52,8 @@
                     <ul class="navbar-nav ml-auto">
                         <!-- Authentication Links -->
                         @guest
-                            <li><a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a></li>
-                            <li><a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a></li>
+                            <li><a class="nav-link" href="{{ route('login') }}">Войти</a></li>
+                            <li><a class="nav-link" href="{{ route('register') }}">Регистрация</a></li>
                         @else
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

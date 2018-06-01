@@ -52,7 +52,7 @@ class ProjectController extends Controller
      * @param  \App\Project  $project
      * @return \Illuminate\Http\Response
      */
-    public function show($typeProject, $category, $id, Project $project)
+    public function show($typeProject, $typeCategoryId, Project $project)
     {
         return view('project', [
             'project' => $project,

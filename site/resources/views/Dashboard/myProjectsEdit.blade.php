@@ -13,15 +13,16 @@
     </nav>
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <div class="card">
+            <div class="card cardEditProject">
                 @if (session('status'))
                     <div class="alert alert-success">
                         {{ session('status') }}
                     </div>
                 @endif
                 <h1>Описание проекта</h1>
-                <h4>Что вам необходимо разработать?</h4>
-                <project></project>
+                <project is-editing-page="{{$isEditingPage}}" 
+                        slug="{{$projectSlug}}">
+                </project>
             </div>
         </div>
     </div>

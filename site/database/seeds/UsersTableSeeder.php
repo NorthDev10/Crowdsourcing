@@ -13,7 +13,7 @@ class UsersTableSeeder extends Seeder
     {
         $allSkils = App\Skill::count();
 
-        factory(App\User::class, 30)->create()->each(function($u) use ($allSkils) {
+        factory(App\User::class, 10)->create()->each(function($u) use ($allSkils) {
             $faker = Faker\Factory::create();
             $numSkills = $faker->unique()->numberBetween(1, 10);
             // генерируем id скилов

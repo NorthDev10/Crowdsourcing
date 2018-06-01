@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Auth;
+use App\User;
 use App\Project;
 use App\Subtask;
 use Illuminate\Support\Facades\Route;
@@ -29,14 +31,41 @@ class RouteServiceProvider extends ServiceProvider
 
         parent::boot();
 
-        Route::bind('my_project', function($value) {
-            return Project::where('slug', $value)->first();
+        Route::bind('user_id', function($userId, $route) {
+            return User::with([
+                'skills',
+                'reviewsFromUsers.project.typeProject',
+                'reviewsFromUsers.reviewer'
+            ])->find($userId);
+        });
+
+        Route::bind('api_my_profile', function($userId, $route) {
+            return User::with('skills')->find($userId);
+        });
+
+        Route::bind('my_project', function($value, $route) {
+            if($route->getActionMethod() != 'edit') {
+                return Project::where('slug', $value)->first();
+            }
+            return $value;
+        });
+
+        Route::bind('api_my_project', function($value, $route) {
+            return Project::with('subtasks')->where('slug', $value)->first();
         });
 
         Route::bind('project', function($value) {
-            return Project::with('customer', 'typeProject', 
-                'executors.user', 'executors.subtask')
+            $project = Project::with('customer', 'typeProject', 
+                'executors.user', 'executors.subtask.category')
                 ->where('slug', $value)->first();
+
+            if($project->status == 'closed') {
+                $project->load(['reviews' => function($query) {
+                    $query->where('reviewer_id', '=', Auth::user()->id)->first();
+                }]);
+            }
+
+            return $project;
         });
     }
 

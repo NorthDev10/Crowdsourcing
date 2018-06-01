@@ -10,6 +10,9 @@
     </nav>
     <div class="row justify-content-center">
         <div class="col-md-12">
+            <div class="d-flex justify-content-end">
+                <a class="btn btn-success m-2" href="{{route('my-projects.create')}}">Добавить проект</a>
+            </div>
             <div class="card">
                 @if (session('status'))
                     <div class="alert alert-success">
@@ -32,7 +35,18 @@
                     <tbody>
                         @foreach ($ProjectList as $Project)
                             <tr>
-                                <td>{{$Project->project_name}}</td>
+                                <td>
+                                    <a href="{{route('project', [
+                                        'type_of_project' => $Project->typeProjectName(),
+                                        'type_category_id' => $Project->type_project_id,
+                                        'project' => $Project->slug
+                                    ])}}">{{$Project->project_name}}</a>
+                                    @if($Project->status == 'opened')
+                                        <span title="Проект набирает исполнителей" class="badge badge-primary">Открыт</span>
+                                    @else
+                                        <span title="Проект завершён" class="badge badge-danger">Закрыт</span>
+                                    @endif
+                                </td>
                                 <td>{{$Project->typeProject->title}}</td>
                                 <td>
                                     @forelse($Project->subtasks as $subtask)
@@ -49,9 +63,7 @@
                                     @endforelse
                                 </td>
                                 <td>
-                                    @if($Project->status == 'closed')
-                                        <span class="fa-check" title="Проект завершён"></span>
-                                    @else
+                                    @if($Project->status())
                                         <form method="POST" action="{{route('my-projects.update', ['my_project' => $Project->slug])}}">
                                             {{ csrf_field() }}
                                             {{ method_field('PUT') }}
@@ -60,6 +72,8 @@
                                                 <span class="calendar-check action" title="Завершить проект"></span>
                                             </button>
                                         </form>
+                                    @else
+                                        <span class="fa-check" title="Проект завершён"></span>
                                     @endif
                                 </td>
                                 <td>{{$Project->created_at}}</td>
@@ -83,9 +97,6 @@
                 @else
                     <div class="alert alert-info" role="alert">
                         У Вас пока нет проектов!
-                    </div>
-                    <div class="d-flex justify-content-center margin-h-20">
-                        <button type="button" class="btn btn-outline-info">Создать проект</button>
                     </div>
                 @endif
             </div>

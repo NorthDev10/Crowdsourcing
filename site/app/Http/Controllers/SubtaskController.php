@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Category;
 use App\Subtask;
+use App\Http\Requests\FindSubtaskRequest;
 use Illuminate\Http\Request;
 
 class SubtaskController extends Controller
@@ -45,7 +46,10 @@ class SubtaskController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return Subtask::addTaskExecutors(
+            $request->input('taskId'), 
+            $request->input('comment')
+        );
     }
 
     /**
@@ -86,6 +90,57 @@ class SubtaskController extends Controller
         ]);
     }
 
+    public function listOfTaskName(Request $request) 
+    {
+        return Subtask::select('id', 'task_name')
+            ->where(
+                'task_name',
+                'like',
+                '%'.$request->input('taskName').'%'
+            )->get();
+    }
+
+    public function findTasks(FindSubtaskRequest $request) 
+    {
+        $query = $request->input('q');
+        $keyWordList = explode(' ', trim($query));
+
+        if(count($keyWordList) > 0) {
+            $Subtask = \App\Subtask::query();
+            $Subtask->with('necessarySkills', 'project.typeProject');
+            $Subtask->where('status', false); // Задача ещё не выполнена
+            // Вывод родительской модели зависит от вложенной,
+            // поиск во вложенной модели necessarySkills
+            $Subtask->whereHas('necessarySkills', function ($query) use ($keyWordList) {
+                $query->where('name', 'like', '%'.$keyWordList[0].'%');
+
+                for($i = 1; $i < count($keyWordList); ++$i) {
+                    if(!empty(trim($keyWordList[$i]))) {
+                        $query->orWhere('name', 'like', '%'.$keyWordList[$i].'%');
+                    }
+                }
+            });
+            // Поиск во вложенной модели project
+            $Subtask->whereHas('project', function ($query) {
+                $query->where('status', 'opened');
+            });
+
+            $SubtaskList = $Subtask->paginate(
+                \Config::get('settings.project.projects_per_page')
+            );
+        }
+
+        $CategoryList = Category::with('children.children', 'children.parent')
+            ->where('parent_id', 0)->get();
+
+        return view('subtasks', [
+            'q' => $query,
+            'projectTypeList' => $CategoryList,
+            'delimiter' => '',
+            'SubtaskList' => $SubtaskList
+        ]);
+    }
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -106,7 +161,7 @@ class SubtaskController extends Controller
      */
     public function update(Request $request, Subtask $subtask)
     {
-        //
+        
     }
 
     /**

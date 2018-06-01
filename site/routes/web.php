@@ -13,17 +13,12 @@
 
 Auth::routes();
 
-Route::get('/', function () {
-    return view('welcome', [
-        'category'   => [],
-        'categories' => App\Category::with('children')->where('parent_id', '0')->get(),
-        'delimiter'  => ''
-     ]);
-})->name('home');
+Route::get('/', 'SubtaskController@index')->name('home');
+
+Route::get('/search-tasks', 'SubtaskController@findTasks')
+        ->name('findTasks');
 
 Route::group(['prefix' => '/projects'], function () {
-
-    Route::get('/', 'SubtaskController@index')->name('subtasks');
 
     Route::get('/{type_of_project}/{category_id}', 'SubtaskController@showProjectsByType')
         ->where('category_id', '\d+')
@@ -34,12 +29,61 @@ Route::group(['prefix' => '/projects'], function () {
         ->name('category');
 });
 
-Route::get('/project/{type_of_project}/{category}/{category_id}/{project}', 'ProjectController@show')
+Route::get('/project/{type_of_project}/{type_category_id}/{project}', 'ProjectController@show')
     ->where('category_id', '\d+')
     ->name('project');
 
 Route::group(['middleware' => 'auth'], function () {
 
     Route::resource('my-projects', 'Dashboard\ProjectController');
-    Route::get('/profile/{id}', 'HomeController@index')->name('profile');
+    Route::resource('my-profile', 'Dashboard\UserProfileController', ['except' => [
+        'show'
+    ]]);
+
+    Route::resource('my-tasks', 'Dashboard\MyTaskListController');
+
+    Route::post('leave-feedback', 'ReviewController@store')->name('leave_feedback');
+
+    Route::get('/profile/{user_id}', 'Dashboard\UserProfileController@show')
+        ->where('user_id', '\d+')
+        ->name('user_profile');
+
+    Route::post('/subscribe_task', 'SubtaskController@store')->name('subscribeTask');
+
+    Route::put('/give_the_task', 'TaskExecutorController@update')->name('give_the_task');
+    Route::put('/pick_up_task', 'TaskExecutorController@update')->name('pick_up_task');
+});
+
+
+
+Route::group(['prefix' => '/api/v1.0/', 'middleware' => 'auth'], function() {
+    Route::get('/categories/projects-type', function() {
+        return App\Category::where('parent_id', 0)->get();
+    });
+
+    Route::get('/categories/parent-id/{id}', function($id) {
+        return App\Category::whereIn('parent_id', function($query) use ($id) {
+            $query->select('id')
+                ->from('categories')
+                ->where('parent_id', 0)
+                ->where('id', $id)
+                ->get();
+        })->get();
+    });
+
+    Route::get('/business-activities', function() {
+        return App\BusinessActivity::all();
+    });
+
+    Route::get('/list-of-skills', function() {
+        return App\Skill::all();
+    });
+
+    Route::post('/list-of-task-name', 'SubtaskController@listOfTaskName');
+
+    Route::resource('api-my-projects', 'Dashboard\ProjectApiController');
+
+    Route::resource('api-my-profile', 'Dashboard\UserProfileApiController', ['only' => [
+        'edit', 'update'
+    ]]);
 });

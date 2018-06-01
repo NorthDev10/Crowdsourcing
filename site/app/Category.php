@@ -9,6 +9,10 @@ class Category extends Model
 
     public $timestamps = false;
 
+    protected $fillable = [
+        'title', 'parent_id', 'slug'
+    ];
+
     // все проекты по типу
     public function projectsByType() {
         return $this->hasMany('App\Project', 'type_project_id');
@@ -58,5 +62,14 @@ class Category extends Model
                 'category_id' => $this->id,
             ]);
         }
+    }
+
+    public static function addCategory(int $parentId, string $categoryName):int {
+        $newCategory = self::firstOrCreate([
+            'title' => $categoryName,
+            'parent_id' => $parentId,
+            'slug' => str_slug($categoryName, '-'),
+        ]);
+        return $newCategory->id;
     }
 }

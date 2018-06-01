@@ -15,7 +15,7 @@ class ProjectsTableSeeder extends Seeder
         $allUsers = App\User::count();
         $allCategories = App\Category::count();
         
-        factory(App\Project::class, 20)->create()->each(function($p) 
+        factory(App\Project::class, 30)->create()->each(function($p) 
                 use ($allSkils, $allUsers, $allCategories) {
             $faker = Faker\Factory::create();
             $categoryList = App\Category::where('id', $p->type_project_id)->first()->children;
@@ -38,14 +38,14 @@ class ProjectsTableSeeder extends Seeder
             $p->subtasks()->saveMany($subtaskList);
 
             
-            
+            $faker = Faker\Factory::create();
             $users = [];
             foreach($subtaskList as $subtask) {
                 // желающие поучаствовать в проекте
                 for($i = 0; $i < $subtask->number_executors; $i++) { 
                     $user = new App\TaskExecutor();
                     $user->subtask_id = $subtask->id;
-                    $user->user_id = $faker->numberBetween(1, $allUsers);
+                    $user->user_id = $faker->unique()->numberBetween(1, $allUsers);
                     $subtask->involved_executors++;
                     $user->comment = $faker->realText(50);
                     $user->user_selected = $faker->boolean;

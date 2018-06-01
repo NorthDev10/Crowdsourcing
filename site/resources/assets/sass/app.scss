@@ -9,6 +9,8 @@
 @import '~bootstrap/scss/bootstrap';
 @import "~fontawesome-scss/fontAwesome.scss";
 
+@import "~vue-snotify/styles/material";
+
 html, body {
   height: 100%;
 }
@@ -61,4 +63,22 @@ aside {
   .calendar-check {
     @include fa($fa-calendar, 'green', 15pt);
   }
+}
+
+.executor-card {
+  margin-bottom: 10px;
+  .card-body {
+    &> div {
+      justify-content: space-between;
+
+      div:last-child {
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
+}
+
+.cardEditProject {
+  padding: 25px;
 }

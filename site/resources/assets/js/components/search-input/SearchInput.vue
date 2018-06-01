@@ -2,15 +2,19 @@
   <div class="search-input">
     <input type="text" ref="search" class="form-control input-text user-input"
            v-model.trim="userInput"
-           v-on:focus="visibleOptions = true">
+           @keyup="onKeyup()"
+           @change="changedUserInput()"
+           @focus="hasFocusUserInput = true; displayList()"
+           @blur="hasFocusUserInput = false">
     <span class="fa-times-circle" 
           title="Очистить поле" 
-          v-on:click="clear()"></span>
+          @click="clear()"></span>
     
     <div v-show="visibleOptions" class="custom-option">
       <span v-for="(option) in searchByOptions" 
-            v-on:click="optionSelected(option)">
-        {{option}}
+            @click="optionSelected(option)"
+            :key="option[attrValName]">
+        {{option[attrTitleName]}}
       </span>
     </div>
   </div>
@@ -21,9 +25,13 @@
 export default {
   name: 'search-input',
   props: {
-    returnVal: {
-      default: true,
-      type: Boolean
+    attrValName: {
+      required: true,
+      type: String,
+    },
+    attrTitleName: {
+      required: true,
+      type: String,
     },
     options: {
       required: true,
@@ -38,32 +46,33 @@ export default {
     },
   },
   created() {
-    if(this.returnVal) {
-      this.currentState.val = this.value;
-      this.currentState.key = getIndexSelectedOption(this.value);
-      this.userInput = this.value;
-    } else {
-      this.currentState.val = this.options[this.value];
-      this.currentState.key = this.value;
-      this.userInput = this.options[this.value];
-    }
+    try {
+      if(typeof this.value == 'string') {
+        this.currentState[this.attrValName] = -1;
+        this.currentState[this.attrTitleName] = this.value;
+        this.userInput = this.value;
+      } else {
+        this.currentState[this.attrValName] = this.value[this.attrValName];
+        this.currentState[this.attrTitleName] = this.value[this.attrTitleName];
+        this.userInput = this.value[this.attrTitleName];
+      }
+    } catch(e) {}
   },
   data() {
     return {
       visibleOptions: false,
       userInput: "",
-      currentState: {
-        key: 0,
-        val: 0,
-      },
+      hasFocusUserInput: false,
+      currentState: {},
     }
   },
   computed: {
     searchByOptions() {
-      if(this.userInput.length > 0) {
+      if(this.userInput != undefined && this.userInput.length > 0) {
+        // сравниваем начало предложения
         let result = this.options.filter((option) => {
           return this.compareStr(
-            option.toLowerCase(),
+            option[this.attrTitleName].toLowerCase(),
             this.userInput.toLowerCase()
           );
         }).sort().slice(0, this.listSize);
@@ -71,7 +80,7 @@ export default {
         if(result.length == 0) {
           // ищим вхождения в словах
           return this.options.filter((option) => {
-            return option.toLowerCase()
+            return option[this.attrTitleName].toLowerCase()
               .indexOf(this.userInput.toLowerCase()) >= 0;
           }).sort().slice(0, this.listSize);
         } else {
@@ -86,25 +95,28 @@ export default {
     compareStr(word, searchWord) {
       return word.substring(0, searchWord.length) == searchWord;
     },
+    changedUserInput() {
+      if(!this.isCoincidenceCurrentOption(this.userInput)) {
+        this.currentState[this.attrValName]   = -1;
+        this.currentState[this.attrTitleName] = this.userInput;
+        this.$emit(
+          'input', 
+          Object.assign({}, this.currentState)
+        );//возвращаем пользовательскую опцию
+      }
+    },
+    //совпадает ли название текущей опции с передаваемой
+    isCoincidenceCurrentOption(optionTitle) {
+      return this.currentState[this.attrTitleName] == optionTitle;
+    },
     optionSelected(option) {
-      let indexOption = this.getIndexSelectedOption(option);
-
-      if(this.currentState.key != indexOption) {
-        this.currentState.key = indexOption;
-        this.currentState.val = option;
-        
-        this.emitData();
+      if(this.currentState[this.attrValName] != option[this.attrValName]) {
+        this.currentState = Object.assign({}, option);
+        this.$emit('input', this.currentState);
       }
       
-      this.userInput = option;
+      this.userInput = this.currentState[this.attrTitleName];
       this.visibleOptions = false;
-    },//из полного массива опций, находим индекс опции
-    getIndexSelectedOption(Option) {
-      for(let key in this.options) {
-        if(this.options[key] == Option) {
-          return key;
-        }
-      }
     },
     hideList(e) {
       try {
@@ -120,27 +132,32 @@ export default {
     },
     clear() {
       this.userInput = '';
-      this.currentState.key = '';
-      this.currentState.val = '';
+      this.currentState = {};
       this.$refs.search.focus();
-      this.emitData();
+      this.$emit('input', this.currentState);
     },
-    emitData() {
-      if(this.returnVal) {
-        this.$emit('input', this.currentState.val);
+    displayList() {
+      if(this.hasFocusUserInput) {
+        this.visibleOptions = true;
       } else {
-        this.$emit('input', this.currentState.key);
+        this.visibleOptions = false;
       }
-    }
-  },
-  watch: { //чтоб при смене языка обновлялось выбранное значение в select-е
-    options() {
-      this.currentState.val = this.options[this.currentState.key];
-      this.userInput = this.options[this.currentState.key];
     },
-    userInput() {
-      if(this.userInput.length == 0) {
-        this.clear();
+    onKeyup() {
+      if(this.userInput.length > 3) {
+        this.$emit('keyup', this.userInput);
+      }
+    },
+  },
+  watch: {
+    searchByOptions() {
+      this.displayList();
+    },
+    value() {
+      if(this.value[this.attrTitleName] != undefined) {
+        this.userInput = this.value[this.attrTitleName];
+      } else {
+        this.userInput = '';
       }
     }
   },

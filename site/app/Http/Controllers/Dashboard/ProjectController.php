@@ -33,7 +33,7 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        //
+        return view('Dashboard.myProjectsCreate');
     }
 
     /**
@@ -66,10 +66,11 @@ class ProjectController extends Controller
      * @param  \App\Project  $project
      * @return \Illuminate\Http\Response
      */
-    public function edit(Project $project)
+    public function edit($projectSlug, Request $request)
     {
         return view('Dashboard.myProjectsEdit', [
-            'project' => $project
+            'isEditingPage' => 'edit',
+            'projectSlug' => $projectSlug
         ]);
     }
 
@@ -82,11 +83,18 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-        $project->fill($request->all());
-        $project->save();
-        
-        return redirect()->back()->with('status', 
-            'Проект "'. $project->project_name . '" обновлён');
+        if(Auth::user()->id == $project->user_id) {
+            $project->fill($request->all());
+            $project->save();
+            
+            return redirect()->back()->with('status', 
+                'Проект "'. $project->project_name . '" обновлён');
+        } else {
+            return redirect()->back()->with(
+                'status', 
+                'Вы можете редактировать только свой проект!'
+            );
+        }
     }
 
     /**
@@ -97,6 +105,23 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        $project->delete();
+        if(Auth::user()->id == $project->user_id) {
+            if($project->delete()) {
+                return redirect()->back()->with(
+                    'status', 
+                    'Проект успешно удалён!'
+                );
+            } else {
+                return redirect()->back()->with(
+                    'status', 
+                    'Что-то пошло не так =('
+                );
+            }
+        } else {
+            return redirect()->back()->with(
+                'status', 
+                'Вы можете удалять только свой проект!'
+            );
+        }
     }
 }

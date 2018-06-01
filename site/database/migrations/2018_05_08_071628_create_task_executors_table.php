@@ -17,9 +17,11 @@ class CreateTaskExecutorsTable extends Migration
             $table->increments('id');
             $table->integer('subtask_id')->unsigned();
             $table->integer('user_id')->unsigned();
-            $table->text('comment');
-            $table->boolean('user_selected');
+            $table->text('comment')->nullable();
+            $table->boolean('user_selected')->default(0);
             $table->timestamps();
+
+            $table->unique(['subtask_id', 'user_id']);
         });
     }
 

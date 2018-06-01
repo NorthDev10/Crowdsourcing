@@ -23,8 +23,9 @@ class CreateSubtasksTable extends Migration
             //участвуют
             $table->tinyInteger('involved_executors')->unsigned()->default(0);
             $table->text('description');
-            $table->boolean('status');
+            $table->boolean('status')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
