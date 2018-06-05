@@ -28,7 +28,7 @@ class MyProfileRequest extends FormRequest
             'name' => 'required|min:2|max:255',
             'phone' => 'required|max:255',
             'password' => 'nullable|min:8',
-            'skills.*.id' => 'numeric',
+            'skills.*.id' => 'integer',
             'skills.*.name' => 'min:1',
         ];
     }

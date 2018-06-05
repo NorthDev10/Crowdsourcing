@@ -32,9 +32,9 @@ class ProjectRequest extends FormRequest
             'subtasks.*.category.title' => 'required|max:50',
             'subtasks.*.description' => 'required|min:10',
             'subtasks.*.necessary_skills.*.name' => 'max:50',
-            'subtasks.*.number_executors' => 'required|numeric|min:1|max:10',
+            'subtasks.*.number_executors' => 'required|integer|min:1|max:10',
             'subtasks.*.task_name' => 'required|min:2|max:255',
-            'tender_closing' => 'required|numeric|between:0,6',
+            'tender_closing' => 'required|integer|between:0,6',
             'type_project.title' => 'required|min:1|max:50',
         ];
     }
@@ -60,7 +60,7 @@ class ProjectRequest extends FormRequest
             'subtasks.*.necessary_skills.*.name.max' => json_encode(['el' => 'subtasksNecessarySkills', 'message' => 'Название навыка не должно превышать 50 символов']),
             'subtasks.*.number_executors.required' => json_encode(['el' => 'subtasksNumberExecutors', 'message' => 'Введите количество исполнителей']),
             'subtasks.*.number_executors.min' => json_encode(['el' => 'subtasksNumberExecutors', 'message' => 'Минимальное количество исполнителей – 1 человек!']),
-            'subtasks.*.number_executors.numeric' => json_encode(['el' => 'subtasksNumberExecutors', 'message' => 'Количество исполнителей должно быть в виде числа!']),
+            'subtasks.*.number_executors.integer' => json_encode(['el' => 'subtasksNumberExecutors', 'message' => 'Количество исполнителей должно быть в виде числа!']),
             'subtasks.*.number_executors.max' => json_encode(['el' => 'subtasksNumberExecutors', 'message' => 'Максимальное количество исполнителей – 10 человек!']),
             'subtasks.*.task_name.required' => json_encode(['el' => 'subtasksTaskName', 'message' => 'Введите название задачи']),
             'subtasks.*.task_name.min' => json_encode(['el' => 'subtasksTaskName', 'message' => 'Название задачи должно быть больше 2 символов']),

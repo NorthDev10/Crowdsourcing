@@ -9,6 +9,15 @@
         </ol>
     </nav>
     <div class="row justify-content-center">
+        @if (count($errors) > 0)
+        <div class="alert alert-danger">
+            <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+            </ul>
+        </div>
+        @endif
         <div class="col-md-12">
             <div class="card p-4">
                 <div class="row justify-content-center">

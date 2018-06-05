@@ -24,8 +24,8 @@ class ReviewRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'numeric',
-            'project_id' => 'required|numeric',
+            'user_id' => 'integer|exists:users,id',
+            'project_id' => 'required|integer|exists:projects,id',
             'description' => 'required|min:5',
         ];
     }
@@ -33,6 +33,8 @@ class ReviewRequest extends FormRequest
     public function messages()
     {
         return [
+            'user_id.exists' => 'Пользователь с таким идентификатором не найден!',
+            'project_id.exists' => 'Проект с таким идентификатором не найден!',
             'description.required' => 'Введите свой отзыв!',
             'description.min' => 'Отзыв должен быть не менее 5 символов',
         ];

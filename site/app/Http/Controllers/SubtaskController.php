@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Category;
 use App\Subtask;
 use App\Http\Requests\FindSubtaskRequest;
+use App\Http\Requests\ParticipateTaskRequest;
 use Illuminate\Http\Request;
 
 class SubtaskController extends Controller
@@ -29,7 +30,7 @@ class SubtaskController extends Controller
     /**
      * Добавляет пользователя, желающего участвовать в тендере
      */
-    public function store(Request $request)
+    public function store(ParticipateTaskRequest $request)
     {
         return Subtask::addTaskExecutors(
             $request->input('taskId'), 

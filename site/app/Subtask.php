@@ -83,7 +83,7 @@ class Subtask extends Model
     // добавляем исполнителя к задаче
     public static function addTaskExecutors(int $taskId, $comment) {
         $subtask = Subtask::with('project')->find($taskId);
-        if(!$subtask->status) {
+        if($subtask != null && !$subtask->status) {
             if($subtask->number_executors > $subtask->involved_executors) {
                 if(Auth::user()->id != $subtask->project->user_id) {
                     if(!self::isUserWillingTask($subtask, Auth::user()->id)) {
@@ -106,6 +106,8 @@ class Subtask extends Model
             } else {
                 return redirect()->back()->with('status', 'Нет свободных мест!');
             }
+        } else {
+            return redirect()->back()->with('status', 'Не удалось найти подзадачу');
         }
     }
 

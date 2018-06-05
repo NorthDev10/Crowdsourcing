@@ -48,13 +48,17 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {   
-        $project->load(['executors' => function($query) {
-            $query->where('user_selected', 1);
-        }, 'executors.subtask', 'executors.user', 'customer']);
-
-        return view('Dashboard.projectProcess', [
-            'project' => $project,
-        ]);
+        if($project->id) {
+            $project->load(['executors' => function($query) {
+                $query->where('user_selected', 1);
+            }, 'executors.subtask', 'executors.user', 'customer']);
+    
+            return view('Dashboard.projectProcess', [
+                'project' => $project,
+            ]);
+        } else {
+            abort(404);
+        }
     }
 
     /**

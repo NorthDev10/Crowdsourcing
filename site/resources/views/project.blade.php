@@ -24,6 +24,15 @@
                         {{ session('status') }}
                     </div>
                 @endif
+                @if (count($errors) > 0)
+                    <div class="alert alert-danger">
+                        <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <div class="card bg-light mb-3">
                 <div class="card-header">
                     <h1>
@@ -154,7 +163,7 @@
             @if($project->status == 'closed')
                 @if(count($project->reviews) == 0)
                 <h3>Оставьте свой отзыв</h3>
-                @else
+                @elseif($project->user_id != Auth::user()->id)
                 <h3>Вы оставили отзыв</h3>
                 @endif
             @else
@@ -163,7 +172,7 @@
         </div>
     </div>
     <div class="row justify-content-center">
-        @if($project->status == 'closed')
+        @if($project->status == 'closed' && $project->user_id != Auth::user()->id)
             @if(count($project->reviews) > 0)
             <div class="col-md-12">
                 @foreach($project->reviews as $review)
@@ -222,7 +231,7 @@
                         </div>
                         <div class="col-xs-6">
                             @auth
-                            @if($project->user_id == Auth::user()->id)
+                            @if($project->user_id == Auth::user()->id && $project->status != 'closed')
                                 @if($executor->user_selected == 0)
                                 <form method="POST" action="{{route('give_the_task')}}">
                                     {{ csrf_field() }}
