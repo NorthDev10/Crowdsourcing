@@ -33,49 +33,6 @@
                 </div>
                 <div id="accordion">
                     <div class="card">
-                        <div class="card-header" id="headingOne">
-                        <h5 class="mb-0">
-                            <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                                Ваши отзывы
-                            </button>
-                        </h5>
-                        </div>
-                    
-                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
-                            <div class="card-body">
-                                @forelse($user['my_reviews'] as $review)
-                                    <div class="card executor-card">
-                                        <div class="card-header">
-                                            <div class="row justify-content-between">
-                                                <div class="col-xs-12">
-                                                    <a href="{{route('project', [
-                                                        'type_of_project' => $review['project']['type_project']['slug'],
-                                                        'type_category_id' => $review['project']['type_project_id'],
-                                                        'project' => $review['project']['slug']
-                                                    ])}}">{{$review['project']['project_name']}}</a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-xs-6">
-                                                    <p>{{$review['description']}}</p>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        <div class="card-footer">
-                                            Отзыв для: <a href="{{route('user_profile', [
-                                                'user_id' => $review['user']['id'],
-                                            ])}}">{{$review['user']['name']}}</a>
-                                        </div>
-                                    </div>
-                                @empty
-                                    <p>Вы пока никому не оставляли отзывов!</p>
-                                @endforelse
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
                         <div class="card-header" id="headingTwo">
                         <h5 class="mb-0">
                             <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
@@ -86,7 +43,7 @@
                         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
                             <div class="card-body">
                                 @forelse($user['reviews_from_users'] as $review)
-                                    <div class="card">
+                                    <div class="card m-1">
                                         <div class="card-header">
                                             <div class="row justify-content-between">
                                                 <div class="col-xs-12">
@@ -103,42 +60,41 @@
                                                 <div class="col-xs-6">
                                                     <p>{{$review['description']}}</p>
                                                 </div>
-                                                @if($review['reviewer_id'])
-                                                <div class="col-xs-6">
-                                                    <form method="POST" action="{{route('leave_feedback')}}">
-                                                        {{ csrf_field() }}
-                                                        <input type="hidden" name="project_id" value="{{$review['project_id']}}">
-                                                        <input type="hidden" name="user_id" value="{{$review['reviewer_id']}}">
-                                                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#reviews-{{$review['reviewer_id']}}">Написать отзыв</button>
-                                                        @component('project.modal')
-                                                            @slot('id')
-                                                                reviews-{{$review['reviewer_id']}}
-                                                            @endslot
-                                                            @slot('title')
-                                                                Напишите свой отзыв
-                                                            @endslot
-                                                            @slot('body')
-                                                                <textarea class="form-control" name="description"></textarea>
-                                                            @endslot
-                                                            @slot('btnText')
-                                                                Оставить отзыв
-                                                            @endslot
-                                                        @endcomponent
-                                                    </form>
-                                                </div>
-                                                @endif
+                                                @empty($review['answer'])
+                                                    @if($review['reviewer_id'])
+                                                    <div class="col-xs-6">
+                                                        <form method="POST" action="{{route('leave_feedback')}}">
+                                                            {{ csrf_field() }}
+                                                            <input type="hidden" name="project_id" value="{{$review['project_id']}}">
+                                                            <input type="hidden" name="user_id" value="{{$review['reviewer_id']}}">
+                                                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#reviews-{{$review['reviewer_id']}}">Написать отзыв</button>
+                                                            @component('project.modal')
+                                                                @slot('id')
+                                                                    reviews-{{$review['reviewer_id']}}
+                                                                @endslot
+                                                                @slot('title')
+                                                                    Напишите свой отзыв
+                                                                @endslot
+                                                                @slot('body')
+                                                                    <textarea class="form-control" name="description"></textarea>
+                                                                @endslot
+                                                                @slot('btnText')
+                                                                    Оставить отзыв
+                                                                @endslot
+                                                            @endcomponent
+                                                        </form>
+                                                    </div>
+                                                    @endif
+                                                @endempty
                                             </div>
+                                            @if(!empty($review['answer']))
                                             <div class="row">
                                                 <div class="col-xs-6">
-                                                    Ваш отзыв: 
-                                                @foreach($review['project']['reviews'] as $myReview)
-                                                    @if($myReview['reviewer_id'] == $user['id'] &&
-                                                        $myReview['user_id'] == $review['reviewer_id'])
-                                                        {{$myReview['description']}}
-                                                    @endif
-                                                @endforeach
+                                                    <b>Ваш отзыв: </b>
+                                                    {{$review['answer'][0]['description']}}
                                                 </div>
                                             </div>
+                                            @endif
                                         </div> 
                                         <div class="card-footer">
                                             Отзыв написал: <a href="{{route('user_profile', [

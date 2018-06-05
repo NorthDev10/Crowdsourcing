@@ -13,19 +13,31 @@
       <div class="row">
         <div class="col-xs-12 col-sm-6">
           <label>Имя пользователя</label><br>
-          <input type="text" class="form-control" v-model="userData.name">
+          <input type="text" 
+                 class="form-control" 
+                 :class="{'input-error':inputErrorElList.name}"
+                 @focus="defaultBorder('name')"
+                 v-model="userData.name">
         </div>
       </div>
       <div class="row">
         <div class="col-xs-12 col-sm-6">
           <label>E-mail</label><br>
-          <input type="text" class="form-control" v-model="userData.email">
+          <input type="text" 
+                 class="form-control" 
+                 :class="{'input-error':inputErrorElList.email}"
+                 @focus="defaultBorder('email')"
+                 v-model="userData.email">
         </div>
       </div>
       <div class="row">
         <div class="col-xs-12 col-sm-6">
           <label>Телефон</label><br>
-          <input type="text" class="form-control" v-model="userData.phone">
+          <input type="text" 
+                 class="form-control" 
+                 :class="{'input-error':inputErrorElList.phone}"
+                 @focus="defaultBorder('phone')"
+                 v-model="userData.phone">
         </div>
       </div>
       <div class="row">
@@ -33,6 +45,8 @@
           <label>Пароль</label><br>
           <input type="password" 
                  class="form-control" 
+                 :class="{'input-error':inputErrorElList.password}"
+                 @focus="defaultBorder('password')"
                  v-model="userData.password">
         </div>
       </div>
@@ -41,6 +55,8 @@
           <label>Подтвердить пароль</label><br>
           <input type="password" 
                  class="form-control" 
+                 :class="{'input-error':inputErrorElList.password}"
+                 @focus="defaultBorder('password')"
                  v-model="confirmPassword"
                  @change="checkPassword()">
         </div>
@@ -116,6 +132,12 @@ export default {
       loadingError: false,
       chosenSkill: {},
       enabledSaveBtn: false,
+      inputErrorElList: {
+        name: false,
+        email: false,
+        phone: false,
+        password: false,
+      },
       userData: {
         name: '',
         email: '',
@@ -179,12 +201,17 @@ export default {
       if(errorList != undefined) {
         for(let errorMessage in errorList) {
           for(let message in errorList[errorMessage]) {
-            this.$snotify.warning(errorList[errorMessage][message]);
+            let m = JSON.parse(errorList[errorMessage][message]);
+            this.inputErrorElList[m['el']] = true;
+            this.$snotify.warning(m['message']);
           }
         }
       } else {
         this.$snotify.warning('что-то пошло не так =(');
       }
+    },
+    defaultBorder(name) {
+      this.inputErrorElList[name] = false;
     },
   },
 }
@@ -212,5 +239,9 @@ export default {
     &:hover {
       opacity: .7;
     }
+  }
+
+  .input-error {
+    border: 1px solid red!important;
   }
 </style>

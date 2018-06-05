@@ -28,8 +28,4 @@ class Skill extends Model
         }
         return $skillIdList;
     }
-
-/*    public static function getNewSkillList(Array $skillList):Array {
-
-    }*/
 }

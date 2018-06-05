@@ -29,4 +29,12 @@ class ReviewRequest extends FormRequest
             'description' => 'required|min:5',
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'description.required' => 'Введите свой отзыв!',
+            'description.min' => 'Отзыв должен быть не менее 5 символов',
+        ];
+    }
 }

@@ -17,6 +17,8 @@
             v-model="projectData.type_project"
             :options="projectTypeList"
             attrValName="id"
+            :class="{'input-error-nested-el':inputErrorElList.typeProject}"
+            @focus="defaultBorder('typeProject')"
             attrTitleName="title">
           </search-input>
         </div>
@@ -24,21 +26,34 @@
       <div class="row">
         <div class="col-xs-12 col-sm-6">
           <label>Название проекта
-            <input type="text" class="form-control" v-model="projectData.project_name">
+            <input type="text" 
+                   class="form-control" 
+                   :class="{'input-error':inputErrorElList.projectName}"
+                   @focus="defaultBorder('projectName')"
+                   v-model="projectData.project_name">
           </label>
         </div>
       </div>
       <div class="row">
         <div class="col-xs-12 col-sm-6">
           <label>Название компании, бренда или домена
-            <input type="text" class="form-control" v-model="projectData.brand">
+            <input type="text" 
+                   class="form-control" 
+                   :class="{'input-error':inputErrorElList.brand}"
+                   @focus="defaultBorder('brand')"
+                   v-model="projectData.brand">
           </label>
         </div>
       </div>
       <div class="row">
         <div class="col-xs-12 col-sm-6">
           <label>Расскажите нам больше о своем проекте
-            <textarea class="form-control" v-model="projectData.project_description" rows="3"></textarea>
+            <textarea 
+              class="form-control" 
+              :class="{'input-error':inputErrorElList.projectDescription}"
+              @focus="defaultBorder('projectDescription')"
+              v-model="projectData.project_description" 
+              rows="3"></textarea>
           </label>
         </div>
         <div class="col-xs-12 col-sm-6">
@@ -51,6 +66,8 @@
             <search-input 
               v-model="projectData.business_activity"
               :options="businessActivityList"
+              :class="{'input-error-nested-el':inputErrorElList.businessActivity}"
+              @focus="defaultBorder('businessActivity')"
               attrValName="id"
               attrTitleName="title">
             </search-input>
@@ -59,7 +76,11 @@
       <div class="row">
         <div class="col-xs-12 col-sm-6">
           <label>Как долго будет выполнятся поиск исполнителей?
-            <select class="form-control" v-model="projectData.tender_closing">
+            <select 
+                class="form-control" 
+                :class="{'input-error':inputErrorElList.tenderClosing}"
+                @focus="defaultBorder('tenderClosing')"
+                v-model="projectData.tender_closing">
               <option v-for="(days, index) in searchDurationExecutors" 
                 :key="index" :value="index">
                 {{days}}
@@ -71,7 +92,11 @@
       <div class="row">
         <div class="col-xs-12 col-sm-6">
           <label>До какого срока необходимо выполнить весь проект?
-            <input class="form-control" type="date" v-model="deadline">
+            <input class="form-control" 
+                   type="date" 
+                   :class="{'input-error':inputErrorElList.deadline}"
+                   @focus="defaultBorder('deadline')"
+                   v-model="deadline">
           </label>
         </div>
       </div>
@@ -79,9 +104,11 @@
       <template v-for="(task, index) in projectData.subtasks">
         <subtask 
           v-model="projectData.subtasks[index]" 
-          @removeTask="projectData.subtasks.splice(index, 1)"
+          @removeTask="removeTask(index)"
           :key="index"
+          :index="index"
           :categoryList="categoryList"
+          :inputErrorElList="inputErrorElList"
           :skillList="skillList">
         </subtask>
       </template>
@@ -89,16 +116,7 @@
         <button 
             type="button" 
             class="btn btn-info"
-            @click="projectData.subtasks.push({
-              id: -1,
-              category: {
-                id: -1,
-                title: '',
-              },
-              description: '',
-              necessary_skills: [],
-              number_executors: 1,
-            })">
+            @click="addTask()">
           Добавить подзадачу
         </button>
       </p>
@@ -169,6 +187,16 @@ export default {
       ],
       loadingData: true,
       loadingError: false,
+      inputErrorElList: {
+        typeProject: false,
+        projectName: false,
+        brand: false,
+        projectDescription: false,
+        businessActivity: false,
+        deadline: false,
+        tenderClosing: false,
+        subtasks: [],
+      },
       projectData: {
         brand: '',
         project_name: '',
@@ -243,7 +271,14 @@ export default {
       if(errorList != undefined) {
         for(let errorMessage in errorList) {
           for(let message in errorList[errorMessage]) {
-            this.$snotify.warning(errorList[errorMessage][message]);
+            let m = JSON.parse(errorList[errorMessage][message]);
+            let index = +errorMessage.split('.')[1];// получаем строку или индекс
+            if(!isNaN(index)) {//Проверяем, находится ли элемент в подзадачах
+              this.inputErrorElList.subtasks[index][m['el']] = true;
+            } else {
+              this.inputErrorElList[m['el']] = true;
+            }
+            this.$snotify.warning(m['message']);
           }
         }
       } else {
@@ -261,6 +296,32 @@ export default {
         this.enabledSaveBtn = false;
       }
     },
+    defaultBorder(name) {
+      this.inputErrorElList[name] = false;
+    },
+    addTask() {
+      this.projectData.subtasks.push({
+        id: -1,
+        category: {
+          id: -1,
+          title: '',
+        },
+        description: '',
+        necessary_skills: [],
+        number_executors: 1,
+      });
+      this.inputErrorElList.subtasks.push({
+        subtasksCategory: false,
+        subtasksDescription: false,
+        subtasksNecessarySkills: false,
+        subtasksNumberExecutors: false,
+        subtasksTaskName: false,
+      });
+    },
+    removeTask(index) {
+      this.inputErrorElList.subtasks.splice(index, 1);
+      this.projectData.subtasks.splice(index, 1);
+    },
   },
   watch: {
     'projectData.type_project': {
@@ -268,7 +329,29 @@ export default {
         this.getCategories();
       },
       deep: true
-    }
+    },
+    'projectData.subtasks': {
+      handler: function (val, oldVal) {
+        if(this.projectData.subtasks.length > this.inputErrorElList.subtasks.length) {
+          let quantityInputErrorEl = this.projectData.subtasks.length - this.inputErrorElList.subtasks.length;
+          for(let i = 0; i < quantityInputErrorEl; ++i) {
+            this.inputErrorElList.subtasks.push({
+              subtasksCategory: false,
+              subtasksDescription: false,
+              subtasksNecessarySkills: false,
+              subtasksNumberExecutors: false,
+              subtasksTaskName: false,
+            });
+          }
+        }
+      },
+    },
   }
 }
 </script>
+
+<style lang="scss">
+  .input-error, .input-error-nested-el input {
+    border: 1px solid red!important;
+  }
+</style>

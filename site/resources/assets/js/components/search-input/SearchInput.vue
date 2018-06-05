@@ -4,7 +4,7 @@
            v-model.trim="userInput"
            @keyup="onKeyup()"
            @change="changedUserInput()"
-           @focus="hasFocusUserInput = true; displayList()"
+           @focus="onFocus()"
            @blur="hasFocusUserInput = false">
     <span class="fa-times-circle" 
           title="Очистить поле" 
@@ -147,6 +147,11 @@ export default {
       if(this.userInput.length > 3) {
         this.$emit('keyup', this.userInput);
       }
+    },
+    onFocus() {
+      this.hasFocusUserInput = true;
+      this.displayList();
+      this.$emit('focus');
     },
   },
   watch: {

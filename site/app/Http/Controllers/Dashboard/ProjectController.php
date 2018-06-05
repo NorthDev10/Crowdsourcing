@@ -11,9 +11,7 @@ use App\Http\Controllers\Controller;
 class ProjectController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * Возвращает список проектов
      */
     public function index()
     {
@@ -27,9 +25,7 @@ class ProjectController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
+     * возвращает страницу создания проекта
      */
     public function create()
     {
@@ -37,34 +33,7 @@ class ProjectController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Project  $project
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Project $project)
-    {
-        return view('Dashboard.myProjectsEdit', [
-            'project' => $project
-        ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Project  $project
-     * @return \Illuminate\Http\Response
+     * возвращает страницу редактирования проекта
      */
     public function edit($projectSlug, Request $request)
     {
@@ -75,11 +44,21 @@ class ProjectController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Project  $project
-     * @return \Illuminate\Http\Response
+     * Возвращает страницу процесса выполнения проекта
+     */
+    public function show(Project $project)
+    {   
+        $project->load(['executors' => function($query) {
+            $query->where('user_selected', 1);
+        }, 'executors.subtask', 'executors.user', 'customer']);
+
+        return view('Dashboard.projectProcess', [
+            'project' => $project,
+        ]);
+    }
+
+    /**
+     * обновление статуса проекта
      */
     public function update(Request $request, Project $project)
     {
@@ -98,10 +77,7 @@ class ProjectController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Project  $project
-     * @return \Illuminate\Http\Response
+     * удаляет проект
      */
     public function destroy(Project $project)
     {

@@ -10,10 +10,7 @@ use App\Http\Controllers\Controller;
 class UserProfileApiController extends Controller
 {
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\User  $user
-     * @return \Illuminate\Http\Response
+     * возвращает данные пользователя
      */
     public function edit(User $user)
     {
@@ -21,11 +18,7 @@ class UserProfileApiController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\User  $user
-     * @return \Illuminate\Http\Response
+     * обновляет данные пользователя
      */
     public function update(MyProfileRequest $request, User $user)
     {

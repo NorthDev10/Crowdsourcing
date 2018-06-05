@@ -75,6 +75,9 @@
                                     @else
                                         <span class="fa-check" title="Проект завершён"></span>
                                     @endif
+                                    <a class="m-2 p-1" href="{{route('my-projects.show', ['my_project' => $Project->slug])}}">
+                                        <span class="fa-tasks" title="Процесс выполнения проекта"></span>
+                                    </a>
                                 </td>
                                 <td>{{$Project->created_at}}</td>
                                 <td>{{$Project->deadline}}</td>

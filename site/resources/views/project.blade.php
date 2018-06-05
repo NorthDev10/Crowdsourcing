@@ -52,10 +52,14 @@
                     <div class="row justify-content-between">
                         <div class="col-xs-12">
                             <h5 class="card-title">Описание проекта:</h5>
+                            <h6 class="card-title"><b>Название компании</b>: {{$project->brand}}</h6>
+                            <h6 class="card-title"><b>Сфера деятельности</b>: {{$project->businessActivity->title}}</h6>
                         </div>
+                        @if($project->status != 'closed')
                         <div class="col-xs-12">
                             <h2 title="Крайний срок для проекта"><span class="badge badge-light">Осталось {{$project->beforeDeadlineLeft()}} дней</span></h2>
                         </div>
+                        @endif
                     </div>
                     <p class="card-text">{{$project->project_description}}</p>
                     <div class="row">
@@ -98,7 +102,7 @@
                                                         <div class="col-xs-12 col-md-6 d-flex justify-content-end">
                                                             @if(!$task->status)
                                                                 @auth
-                                                                    @if($project->user_id != Auth::user()->id)
+                                                                    @if($project->user_id != Auth::user()->id && $task->project->status == 'opened')
                                                                     <form method="POST" action="{{route('subscribeTask')}}">
                                                                         {{ csrf_field() }}
                                                                         <input type="hidden" name="taskId" value="{{$task->id}}">

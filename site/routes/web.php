@@ -35,12 +35,17 @@ Route::get('/project/{type_of_project}/{type_category_id}/{project}', 'ProjectCo
 
 Route::group(['middleware' => 'auth'], function () {
 
-    Route::resource('my-projects', 'Dashboard\ProjectController');
-    Route::resource('my-profile', 'Dashboard\UserProfileController', ['except' => [
-        'show'
+    Route::resource('my-projects', 'Dashboard\ProjectController', ['except' => [
+        'store',
     ]]);
 
-    Route::resource('my-tasks', 'Dashboard\MyTaskListController');
+    Route::resource('my-profile', 'Dashboard\UserProfileController', ['except' => [
+        'show', 'create', 'store', 'update', 'destroy'
+    ]]);
+
+    Route::resource('my-tasks', 'Dashboard\MyTaskListController', ['only' => [
+        'index', 'update'
+    ]]);
 
     Route::post('leave-feedback', 'ReviewController@store')->name('leave_feedback');
 
@@ -81,7 +86,9 @@ Route::group(['prefix' => '/api/v1.0/', 'middleware' => 'auth'], function() {
 
     Route::post('/list-of-task-name', 'SubtaskController@listOfTaskName');
 
-    Route::resource('api-my-projects', 'Dashboard\ProjectApiController');
+    Route::resource('api-my-projects', 'Dashboard\ProjectApiController', ['only' => [
+        'store', 'edit', 'update'
+    ]]);
 
     Route::resource('api-my-profile', 'Dashboard\UserProfileApiController', ['only' => [
         'edit', 'update'

@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Exception;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
@@ -34,6 +35,10 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
+        if(!env('APP_DEBUG') && $exception instanceof MethodNotAllowedHttpException) 
+        {
+            abort(404);
+        }
         parent::report($exception);
     }
 

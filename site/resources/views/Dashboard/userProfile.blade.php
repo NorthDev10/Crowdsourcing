@@ -56,6 +56,14 @@
                                                     <p>{{$review['description']}}</p>
                                                 </div>
                                             </div>
+                                            @if(!empty($review['answer']))
+                                            <div class="row">
+                                                <div class="col-xs-6">
+                                                    <b>Пользователь ответил: </b>
+                                                    {{$review['answer'][0]['description']}}
+                                                </div>
+                                            </div>
+                                            @endif
                                         </div> 
                                         <div class="card-footer">
                                             Отзыв написал: <a href="{{route('user_profile', [

@@ -57,7 +57,7 @@ class Project extends Model
     // до истечения срока проекта
     public function beforeDeadlineLeft() {
         $deadline = Carbon::parse($this->deadline);
-        return $deadline->diffInDays($this->created_at);
+        return $deadline->diffInDays(Carbon::now());
     }
 
     // до истечения тендера проекта

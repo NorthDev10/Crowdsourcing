@@ -4,17 +4,14 @@ namespace App\Http\Controllers\Dashboard;
 
 use Auth;
 use Config;
-use App\User;
-use Carbon\Carbon;
+use App\Subtask;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class MyTaskListController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * выдаёт список задач пользователя
      */
     public function index()
     {
@@ -30,68 +27,23 @@ class MyTaskListController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
+     * Отмечает задачу как выполнена
      */
-    public function create()
+    public function update(Request $request, Subtask $subtask)
     {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\User  $user
-     * @return \Illuminate\Http\Response
-     */
-    public function show(User $user)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\User  $user
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(User $user)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\User  $user
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, User $user)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\User  $user
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(User $user)
-    {
-        //
+        if(Subtask::isUserInvolveTask($subtask, Auth::user()->id)) {
+            if($subtask->project->status != 'closed') {
+                $subtask->status = 1;
+                if($subtask->save()) {
+                    return redirect()->back();
+                } else {
+                    return redirect()->back()->with('status', 'Что-то пошло не так =(');
+                }
+            } else {
+                return redirect()->back()->with('status', 'ВЫ опоздали! Проект уже закрыт.');
+            }
+        } else {
+            abort(404);
+        }
     }
 }

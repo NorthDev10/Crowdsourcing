@@ -87,4 +87,20 @@ class User extends Authenticatable
             return ['status' => false, 'message' => 'Вы можете редактировать только свой профиль!'];
         }
     }
+
+    public static function getMyProfile() {
+        $user = Auth::user();
+        $user->load([
+            'skills',
+            'reviewsFromUsers.project.typeProject',
+            'reviewsFromUsers.reviewer',
+            'commentsOnTasks.subtask.project.typeProject'
+        ]);
+
+        //answer использует 2 параметра от родительского объекта,
+        // поэтому используем “ленивую” загрузку вложенных моделей
+        $user->reviewsFromUsers->load('answer');
+
+        return $user;
+    }
 }

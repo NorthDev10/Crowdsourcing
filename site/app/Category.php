@@ -40,12 +40,9 @@ class Category extends Model
                 $query->where('project_id', $projectId);
             },
             'tasksByCategory.necessarySkills'
-        ])
-            ->select('categories.*')
-            ->join('subtasks', 'categories.id', '=', 'subtasks.category_id')
-            ->where('subtasks.project_id', $projectId)
-            ->groupBy('categories.id')
-            ->get();
+        ])->whereHas('tasksByCategory', function($query) use ($projectId) {
+            $query->where('project_id', $projectId);
+        })->get();
     }
 
     // возвращает ссылку на задачи по выбранной категории

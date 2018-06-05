@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
+    /**
+     * Создаёт новый отзыв
+     */
     public function store(ReviewRequest $request)
     {   
         return Review::createReview($request);

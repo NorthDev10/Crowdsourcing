@@ -10,9 +10,7 @@ use Illuminate\Http\Request;
 class SubtaskController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * Страница со всеми подзадачами
      */
     public function index()
     {
@@ -29,20 +27,7 @@ class SubtaskController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * Добавляет пользователя, желающего участвовать в тендере
      */
     public function store(Request $request)
     {
@@ -53,10 +38,7 @@ class SubtaskController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\Subtask  $subtask
-     * @return \Illuminate\Http\Response
+     * возвращает страницу со всеми подзадачами по её категории
      */
     public function show($typeOfProject, $category, $categoryId)
     {
@@ -75,6 +57,9 @@ class SubtaskController extends Controller
         ]);
     }
 
+    /**
+     * возвращает страницу со всеми подзадачами по категории проекта
+     */
     public function showProjectsByType($typeOfProject, $id_category)
     {
         $SubtaskList = Subtask::getAllSubtasksByType($id_category);
@@ -90,6 +75,9 @@ class SubtaskController extends Controller
         ]);
     }
 
+    /*
+    * Возвращает список задач
+    */
     public function listOfTaskName(Request $request) 
     {
         return Subtask::select('id', 'task_name')
@@ -100,35 +88,13 @@ class SubtaskController extends Controller
             )->get();
     }
 
+    /*
+    * возвращает страницу с найденными задачами
+    */
     public function findTasks(FindSubtaskRequest $request) 
     {
         $query = $request->input('q');
-        $keyWordList = explode(' ', trim($query));
-
-        if(count($keyWordList) > 0) {
-            $Subtask = \App\Subtask::query();
-            $Subtask->with('necessarySkills', 'project.typeProject');
-            $Subtask->where('status', false); // Задача ещё не выполнена
-            // Вывод родительской модели зависит от вложенной,
-            // поиск во вложенной модели necessarySkills
-            $Subtask->whereHas('necessarySkills', function ($query) use ($keyWordList) {
-                $query->where('name', 'like', '%'.$keyWordList[0].'%');
-
-                for($i = 1; $i < count($keyWordList); ++$i) {
-                    if(!empty(trim($keyWordList[$i]))) {
-                        $query->orWhere('name', 'like', '%'.$keyWordList[$i].'%');
-                    }
-                }
-            });
-            // Поиск во вложенной модели project
-            $Subtask->whereHas('project', function ($query) {
-                $query->where('status', 'opened');
-            });
-
-            $SubtaskList = $Subtask->paginate(
-                \Config::get('settings.project.projects_per_page')
-            );
-        }
+        $SubtaskList = Subtask::findTasks($query);
 
         $CategoryList = Category::with('children.children', 'children.parent')
             ->where('parent_id', 0)->get();
@@ -139,39 +105,5 @@ class SubtaskController extends Controller
             'delimiter' => '',
             'SubtaskList' => $SubtaskList
         ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Subtask  $subtask
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Subtask $subtask)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Subtask  $subtask
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Subtask $subtask)
-    {
-        
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Subtask  $subtask
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Subtask $subtask)
-    {
-        //
     }
 }

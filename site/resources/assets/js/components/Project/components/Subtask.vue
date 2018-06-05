@@ -15,6 +15,8 @@
           <search-input 
             v-model="value.category"
             :options="categoryList"
+            :class="{'input-error-nested-el':inputErrorElList.subtasks[index].subtasksCategory}"
+            @focus="defaultBorder('subtasksCategory')"
             attrValName="id"
             attrTitleName="title">
           </search-input>
@@ -27,6 +29,8 @@
             v-model="value.task_name"
             :options="taskNameList"
             @keyup="getSkillList"
+            :class="{'input-error-nested-el':inputErrorElList.subtasks[index].subtasksTaskName}"
+            @focus="defaultBorder('subtasksTaskName')"
             attrValName="id"
             attrTitleName="task_name">
           </search-input>
@@ -37,6 +41,8 @@
           <label class="description">Опишите, что необходимо сделать
             <textarea v-model="value.description" 
                       class="form-control" 
+                      :class="{'input-error':inputErrorElList.subtasks[index].subtasksDescription}"
+                      @focus="defaultBorder('subtasksDescription')"
                       id="projectDescribe" 
                       rows="3">
             </textarea>
@@ -49,6 +55,8 @@
             <search-input 
               v-model="chosenSkill"
               :options="skillList"
+              :class="{'input-error-nested-el':inputErrorElList.subtasks[index].subtasksNecessarySkills}"
+              @focus="defaultBorder('subtasksNecessarySkills')"
               attrValName="id"
               attrTitleName="name">
             </search-input>
@@ -74,7 +82,13 @@
       <div class="row">
         <div class="col-xs-12 col-sm-6">
           <label>Количество исполнителей
-            <input type="number" v-model="value.number_executors" min="1" class="form-control">
+            <input 
+              type="number" 
+              :class="{'input-error':inputErrorElList.subtasks[index].subtasksNumberExecutors}"
+              @focus="defaultBorder('subtasksNumberExecutors')"
+              v-model="value.number_executors" 
+              min="1" 
+              class="form-control">
           </label>
         </div>
       </div>
@@ -87,6 +101,9 @@
 export default {
   name: 'subtask',
   props: {
+    index: {
+      type: Number,
+    },
     value: {
       required: true,
     },
@@ -95,7 +112,10 @@ export default {
     },
     skillList: {
       required: true,
-    }
+    },
+    inputErrorElList: {
+      required: true,
+    },
   },
   data() {
     return {
@@ -130,6 +150,9 @@ export default {
           //this.$snotify.error(this.translate('info.something_went_wrong'));
           console.log(error);
         });
+    },
+    defaultBorder(name) {
+      this.inputErrorElList[name] = false;
     },
   },
 }

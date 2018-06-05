@@ -23,10 +23,10 @@ class TaskExecutor extends Model
     }
 
     public static function pickUpTask(Request $request) {
-        $executor = TaskExecutor::with('subtask.project', 'user')
-            ->where('subtask_id', $request->input('subtask_id'))
-            ->where('user_id', $request->input('user_id'))
-            ->first();
+        $executor = self::getTaskExecutor(
+            $request->input('subtask_id'), 
+            $request->input('user_id')
+        );
 
         if($executor->subtask->project->user_id == Auth::user()->id) {
             if($executor->user_selected == 1) {
@@ -46,10 +46,10 @@ class TaskExecutor extends Model
     }
 
     public static function giveTheTask(Request $request) {
-        $executor = TaskExecutor::with('subtask.project', 'user')
-            ->where('subtask_id', $request->input('subtask_id'))
-            ->where('user_id', $request->input('user_id'))
-            ->first();
+        $executor = self::getTaskExecutor(
+            $request->input('subtask_id'), 
+            $request->input('user_id')
+        );
 
         if($executor->subtask->project->user_id == Auth::user()->id) {
             if($executor->subtask->number_executors > $executor->subtask->involved_executors) {
@@ -70,5 +70,13 @@ class TaskExecutor extends Model
                 return redirect()->back()->with('status', 'Нет свободных мест!');
             }
         }
+    }
+    
+    // возвращает исполнителя (пользователя) задачи и проект, в котором он участвует
+    protected static function getTaskExecutor(int $subtaskId, int $userId):TaskExecutor {
+        return TaskExecutor::with('subtask.project', 'user')
+            ->where('subtask_id', $subtaskId)
+            ->where('user_id', $userId)
+            ->first();
     }
 }

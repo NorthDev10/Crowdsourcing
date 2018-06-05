@@ -32,11 +32,19 @@ class RouteServiceProvider extends ServiceProvider
         parent::boot();
 
         Route::bind('user_id', function($userId, $route) {
-            return User::with([
+            $user = User::with([
                 'skills',
                 'reviewsFromUsers.project.typeProject',
                 'reviewsFromUsers.reviewer'
             ])->find($userId);
+
+            $user->reviewsFromUsers->load('answer');
+
+            return $user;
+        });
+
+        Route::bind('my_task', function($taskId, $route) {
+            return Subtask::with('taskExecutors')->find($taskId);
         });
 
         Route::bind('api_my_profile', function($userId, $route) {
