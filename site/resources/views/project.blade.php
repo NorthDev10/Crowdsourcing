@@ -37,7 +37,7 @@
                 <div class="card-header">
                     <h1>
                         {{$project->project_name}}
-                        @if($status)
+                        @if($project->status != 'closed')
                             <span title="Проект набирает исполнителей" class="badge badge-primary">Открыт</span>
                         @else
                             <span title="Проект завершён" class="badge badge-danger">Закрыт</span>
@@ -160,10 +160,10 @@
     </div>
     <div class="row justify-content-center">
         <div class="col-xs-12">
-            @if($project->status == 'closed')
+            @if($project->status == 'closed' && $project->user_id != Auth::user()->id)
                 @if(count($project->reviews) == 0)
                 <h3>Оставьте свой отзыв</h3>
-                @elseif($project->user_id != Auth::user()->id)
+                @else
                 <h3>Вы оставили отзыв</h3>
                 @endif
             @else

@@ -27,7 +27,7 @@
                                         'type_category_id' => $task->project->type_project_id,
                                         'project' => $task->project->slug
                                     ])}}">{{$task->task_name}}</a>
-                                    @if($task->project->status == 'opened')
+                                    @if($task->project->status != 'closed')
                                         <span title="Проект набирает исполнителей" class="badge badge-primary">Открыт</span>
                                     @else
                                         <span title="Проект завершён" class="badge badge-danger">Закрыт</span>

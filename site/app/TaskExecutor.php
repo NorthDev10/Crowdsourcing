@@ -28,18 +28,17 @@ class TaskExecutor extends Model
                     $executor->user_selected = 0;
                     $executor->subtask->involved_executors--;
                     $executor->push();
-                    return redirect()->back()->with('status', 
-                        'Пользователь '.$executor->user->name.
+                    return ['status' => 'Пользователь '.$executor->user->name.
                         ' отклонён от задачи: '.
-                        $executor->subtask->task_name);
+                        $executor->subtask->task_name];
                 } else {
-                    return redirect()->back()->with('status', 
-                        'пользователь '.$executor->user->name.' не участвовал в задании');
+                    return ['status' => 'пользователь '.$executor->user->name.' не участвовал в задании'];
                 }
             } else {
-                return redirect()->back()->with('status', 'Вы не можете забрать задачу у исполнителя!, поскольку проект завершён.');
+                return ['status' => 'Вы не можете забрать задачу у исполнителя!, поскольку проект завершён.'];
             }
         }
+        return ['status' => 'Управлять исполнителями может только владелец проекта!'];
     }
 
     public static function giveTheTask(TaskExecutor $executor) {
@@ -50,21 +49,19 @@ class TaskExecutor extends Model
                         $executor->user_selected = 1;
                         $executor->subtask->involved_executors++;
                         $executor->push();
-                        return redirect()->back()->with('status', 
-                            'Пользователь '.$executor->user->name.
-                            ' приступил к выполнению задачи: '.
-                            $executor->subtask->task_name);
+                        return ['status' => 'Пользователь '.$executor->user->name.
+                            ' приступил к выполнению задачи: '.$executor->subtask->task_name];
                     } else {
-                        return redirect()->back()->with('status', 
-                            'пользователь '.$executor->user->name.' уже выбран');
+                        return ['status' => 'пользователь '.$executor->user->name.' уже выбран'];
                     }
                 } else {
-                    return redirect()->back()->with('status', 'Нет свободных мест!');
+                    return ['status' => 'Нет свободных мест!'];
                 }
             } else {
-                return redirect()->back()->with('status', 'Вы не можете выбрать исполнителя!, поскольку проект завершён.');
+                return ['status' => 'Вы не можете выбрать исполнителя!, поскольку проект завершён.'];
             }
         }
+        return ['status' => 'Управлять исполнителями может только владелец проекта!'];
     }
     
     // возвращает исполнителя (пользователя) задачи и проект, в котором он участвует

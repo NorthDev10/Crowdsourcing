@@ -5,6 +5,7 @@ namespace App;
 use Auth;
 use Config;
 use Lang;
+use App\Project;
 use App\Skill;
 use Carbon\Carbon;
 use App\TaskExecutor;
@@ -210,11 +211,15 @@ class Subtask extends Model
         return false;
     }
 
-    public function durationTask($beganPerformTask):string {
-        if($this->status) {
-            $executionTasks = Carbon::parse($this->updated_at);
+    public function durationTask($beganPerformTask, Project $project):string {
+        if($project->status == 'closed' && $this->status == 0) {
+            $executionTasks = Carbon::parse($project->updated_at);
         } else {
-            $executionTasks = Carbon::now();
+            if($this->status) {
+                $executionTasks = Carbon::parse($this->updated_at);
+            } else {
+                $executionTasks = Carbon::now();
+            }
         }
         
         $days = $executionTasks->diffInDays(Carbon::parse($beganPerformTask));
@@ -227,6 +232,18 @@ class Subtask extends Model
             } else {
                 $minutes = $executionTasks->diffInMinutes(Carbon::parse($beganPerformTask));
                 return $minutes.' '.Lang::choice('минута|минуты|минут', $minutes, [], 'ru');
+            }
+        }
+    }
+
+    public function status(Project $project) {
+        if($project->status == 'closed' && $this->status == 0) {
+            return 'не выполнена';
+        } else {
+            if($this->status) {
+                return 'выполнена';
+            } else {
+                return 'выполняется';
             }
         }
     }

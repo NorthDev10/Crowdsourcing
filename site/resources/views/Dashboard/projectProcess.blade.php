@@ -18,7 +18,13 @@
                     </div>
                 @endif
                 <div class="card-header">
-                    <h1>{{$project->project_name}}</h1>
+                    <h1>{{$project->project_name}}
+                        @if($project->status != 'closed')
+                            <span title="Проект набирает исполнителей" class="badge badge-primary">Открыт</span>
+                        @else
+                            <span title="Проект завершён" class="badge badge-danger">Закрыт</span>
+                        @endif
+                    </h1>
                 </div>
                 <div class="card-header">
                     <strong>Заказчик:</strong> 
@@ -55,13 +61,9 @@
                                     </td>
                                     <td>{{$executor->updated_at}}</td>
                                     <td>{{$executor->subtask->task_name}}</td>
-                                    <td>{{$executor->subtask->durationTask($executor->updated_at)}}</td>
+                                    <td>{{$executor->subtask->durationTask($executor->updated_at, $project)}}</td>
                                     <td>
-                                        @if($executor->subtask->status)
-                                            выполнена
-                                        @else
-                                            выполняется
-                                        @endif
+                                        {{$executor->subtask->status($project)}}
                                     </td>
                                 </tr>
                             @empty

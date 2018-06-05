@@ -41,7 +41,7 @@
                                         'type_category_id' => $Project->type_project_id,
                                         'project' => $Project->slug
                                     ])}}">{{$Project->project_name}}</a>
-                                    @if($Project->status == 'opened')
+                                    @if($Project->status != 'closed')
                                         <span title="Проект набирает исполнителей" class="badge badge-primary">Открыт</span>
                                     @else
                                         <span title="Проект завершён" class="badge badge-danger">Закрыт</span>
@@ -63,7 +63,7 @@
                                     @endforelse
                                 </td>
                                 <td>
-                                    @if($Project->status())
+                                    @if($Project->status != 'closed')
                                         <form method="POST" action="{{route('my-projects.update', ['my_project' => $Project->slug])}}">
                                             {{ csrf_field() }}
                                             {{ method_field('PUT') }}

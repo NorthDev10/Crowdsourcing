@@ -24,9 +24,15 @@ class TaskExecutorController extends Controller
         }
 
         if($request->input('user_selected') == 1) {
-            return TaskExecutor::giveTheTask($executor);
+            return redirect()->back()->with(
+                'status', 
+                TaskExecutor::giveTheTask($executor)['status']
+            );
         } else {
-            return TaskExecutor::pickUpTask($executor);
+            return redirect()->back()->with(
+                'status', 
+                TaskExecutor::pickUpTask($executor)['status']
+            );
         }
     }
 }
